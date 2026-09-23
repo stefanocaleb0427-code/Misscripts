@@ -1,11 +1,13 @@
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+-- 1. Crear el contenedor principal de la interfaz
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "StefanoEML_Menu"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
+-- 2. Crear el botón flotante para abrir/cerrar el menú principal
 local botonToggle = Instance.new("TextButton")
 botonToggle.Size = UDim2.new(0, 50, 0, 50)
 botonToggle.Position = UDim2.new(0.02, 0, 0.2, 0)
@@ -19,6 +21,7 @@ local cornerToggle = Instance.new("UICorner")
 cornerToggle.CornerRadius = UDim.new(0, 12)
 cornerToggle.Parent = botonToggle
 
+-- 3. Crear el Marco del Menú Principal (Ventana)
 local framePrincipal = Instance.new("Frame")
 framePrincipal.Size = UDim2.new(0, 260, 0, 150)
 framePrincipal.Position = UDim2.new(0.02, 0, 0.3, 0)
@@ -31,6 +34,7 @@ local cornerFrame = Instance.new("UICorner")
 cornerFrame.CornerRadius = UDim.new(0, 10)
 cornerFrame.Parent = framePrincipal
 
+-- Título Personalizado del Menú
 local titulo = Instance.new("TextLabel")
 titulo.Size = UDim2.new(0, 200, 0, 40)
 titulo.Position = UDim2.new(0, 15, 0, 0)
@@ -42,6 +46,7 @@ titulo.TextXAlignment = Enum.TextXAlignment.Left
 titulo.BackgroundTransparency = 1
 titulo.Parent = framePrincipal
 
+-- Botón "X" para cerrar dentro de la ventana
 local botonX = Instance.new("TextButton")
 botonX.Size = UDim2.new(0, 30, 0, 30)
 botonX.Position = UDim2.new(1, -35, 0, 5)
@@ -56,6 +61,7 @@ local cornerX = Instance.new("UICorner")
 cornerX.CornerRadius = UDim.new(0, 6)
 cornerX.Parent = botonX
 
+-- 4. Crear la Casilla de Activación (Checkbox)
 local fondoCasilla = Instance.new("Frame")
 fondoCasilla.Size = UDim2.new(0, 25, 0, 25)
 fondoCasilla.Position = UDim2.new(0, 20, 0, 70)
@@ -75,6 +81,7 @@ checkbox.TextSize = 18
 checkbox.Font = Enum.Font.SourceSansBold
 checkbox.Parent = fondoCasilla
 
+-- Texto al lado de la casilla
 local etiquetaCasilla = Instance.new("TextLabel")
 etiquetaCasilla.Size = UDim2.new(0, 180, 0, 25)
 etiquetaCasilla.Position = UDim2.new(0, 55, 0, 70)
@@ -86,6 +93,7 @@ etiquetaCasilla.TextXAlignment = Enum.TextXAlignment.Left
 etiquetaCasilla.BackgroundTransparency = 1
 etiquetaCasilla.Parent = framePrincipal
 
+-- 5. Lógica del Bucle de Fuerza Visual
 local activado = false
 local fuerzaSimulada = 302100000000000 
 
@@ -105,7 +113,7 @@ task.spawn(function()
         task.wait(1)
         if activado then
             fuerzaSimulada = fuerzaSimulada + 1000000000000 
-            local textoNuevo = formatNumero(fuerzaSimulada)
+            local textoNuevo = formatNumero(fuerzaSimulada) -- ¡Error corregido aquí!
             
             for _, v in ipairs(playerGui:GetDescendants()) do
                 if v:IsA("TextLabel") or v:IsA("TextBox") then
@@ -118,6 +126,7 @@ task.spawn(function()
     end
 end)
 
+-- 6. Configurar Eventos de Clic
 checkbox.MouseButton1Click:Connect(function()
     activado = not activado
     if activado then
