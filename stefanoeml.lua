@@ -1,5 +1,6 @@
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
+local userInputService = game:GetService("UserInputService")
 
 -- 1. Crear el contenedor principal de la interfaz
 local screenGui = Instance.new("ScreenGui")
@@ -7,7 +8,7 @@ screenGui.Name = "StefanoEML_Menu"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- 2. Crear el botón flotante para abrir/cerrar el menú principal
+-- 2. Crear el botón flotante (Configurado para ser arrastrable)
 local botonToggle = Instance.new("TextButton")
 botonToggle.Size = UDim2.new(0, 50, 0, 50)
 botonToggle.Position = UDim2.new(0.02, 0, 0.2, 0)
@@ -21,7 +22,41 @@ local cornerToggle = Instance.new("UICorner")
 cornerToggle.CornerRadius = UDim.new(0, 12)
 cornerToggle.Parent = botonToggle
 
--- 3. Crear el Marco del Menú Principal (Ventana ampliada a 190 de altura)
+-- SCRIPT INTERNO PARA HACER EL BOTÓN ARRASTRABLE EN MÓVIL Y PC
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    botonToggle.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+botonToggle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = botonToggle.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+botonToggle.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+userInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+-- 3. Marco del Menú Stefano EML (Ventana)
 local framePrincipal = Instance.new("Frame")
 framePrincipal.Size = UDim2.new(0, 260, 0, 190)
 framePrincipal.Position = UDim2.new(0.02, 0, 0.3, 0)
@@ -34,7 +69,7 @@ local cornerFrame = Instance.new("UICorner")
 cornerFrame.CornerRadius = UDim.new(0, 10)
 cornerFrame.Parent = framePrincipal
 
--- Título Personalizado del Menú
+-- Título
 local titulo = Instance.new("TextLabel")
 titulo.Size = UDim2.new(0, 200, 0, 40)
 titulo.Position = UDim2.new(0, 15, 0, 0)
@@ -46,7 +81,7 @@ titulo.TextXAlignment = Enum.TextXAlignment.Left
 titulo.BackgroundTransparency = 1
 titulo.Parent = framePrincipal
 
--- Botón "X" para cerrar dentro de la ventana
+-- Botón "X"
 local botonX = Instance.new("TextButton")
 botonX.Size = UDim2.new(0, 30, 0, 30)
 botonX.Position = UDim2.new(1, -35, 0, 5)
@@ -61,7 +96,7 @@ local cornerX = Instance.new("UICorner")
 cornerX.CornerRadius = UDim.new(0, 6)
 cornerX.Parent = botonX
 
--- 4. Crear la Casilla de Activación (Checkbox)
+-- 4. Casilla de Activación (Checkbox)
 local fondoCasilla = Instance.new("Frame")
 fondoCasilla.Size = UDim2.new(0, 25, 0, 25)
 fondoCasilla.Position = UDim2.new(0, 20, 0, 65)
@@ -78,14 +113,12 @@ checkbox.BackgroundTransparency = 1
 checkbox.Text = "" 
 checkbox.TextColor3 = Color3.fromRGB(0, 255, 0)
 checkbox.TextSize = 18
-checkbox.Font = Enum.Font.SourceSansBold
 checkbox.Parent = fondoCasilla
 
--- Texto al lado de la casilla
 local etiquetaCasilla = Instance.new("TextLabel")
 etiquetaCasilla.Size = UDim2.new(0, 180, 0, 25)
 etiquetaCasilla.Position = UDim2.new(0, 55, 0, 65)
-etiquetaCasilla.Text = "Activar bucle (Format: Qa)"
+etiquetaCasilla.Text = "Activar bucle a 30ms (Qa)"
 etiquetaCasilla.TextSize = 14
 etiquetaCasilla.TextColor3 = Color3.fromRGB(255, 255, 255)
 etiquetaCasilla.Font = Enum.Font.SourceSans
@@ -93,7 +126,7 @@ etiquetaCasilla.TextXAlignment = Enum.TextXAlignment.Left
 etiquetaCasilla.BackgroundTransparency = 1
 etiquetaCasilla.Parent = framePrincipal
 
--- 5. NUEVA SECCIÓN: Créditos en la parte inferior del Menú
+-- 5. Sección de Créditos del Clan
 local lineaDivisoria = Instance.new("Frame")
 lineaDivisoria.Size = UDim2.new(1, -30, 0, 1)
 lineaDivisoria.Position = UDim2.new(0, 15, 0, 120)
@@ -112,18 +145,18 @@ textoCreditos.TextXAlignment = Enum.TextXAlignment.Center
 textoCreditos.BackgroundTransparency = 1
 textoCreditos.Parent = framePrincipal
 
-local menciónClan = Instance.new("TextLabel")
-menciónClan.Size = UDim2.new(1, -30, 0, 25)
-menciónClan.Position = UDim2.new(0, 15, 0, 150)
-menciónClan.Text = "@clan.EML"
-menciónClan.TextSize = 15
-menciónClan.TextColor3 = Color3.fromRGB(255, 200, 50) -- Dorado brillante para el clan
-menciónClan.Font = Enum.Font.SourceSansBold
-menciónClan.TextXAlignment = Enum.TextXAlignment.Center
-menciónClan.BackgroundTransparency = 1
-menciónClan.Parent = framePrincipal
+local mencionClan = Instance.new("TextLabel")
+mencionClan.Size = UDim2.new(1, -30, 0, 25)
+mencionClan.Position = UDim2.new(0, 15, 0, 150)
+mencionClan.Text = "@clan.EML"
+mencionClan.TextSize = 15
+mencionClan.TextColor3 = Color3.fromRGB(255, 200, 50) 
+mencionClan.Font = Enum.Font.SourceSansBold
+mencionClan.TextXAlignment = Enum.TextXAlignment.Center
+mencionClan.BackgroundTransparency = 1
+mencionClan.Parent = framePrincipal
 
--- 6. Lógica de Fuerza con Conversión a Qa, Qi, Sx... (30ms)
+-- 6. Lógica de Fuerza con Conversión a Qa (30ms)
 local activado = false
 local fuerzaSimulada = 338600000000000 
 
@@ -132,7 +165,8 @@ local siglas = {"", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"
 local function formatNumero(num)
     if num < 1000 then return tostring(num) end
     local id = math.floor(math.log10(num) / 3) + 1
-    local siglaActual = siglas[id] or "Inf"
+    if id > #siglas then id = #siglas end
+    local siglaActual = siglas[id]
     local valorRedondeado = num / (10 ^ ((id - 1) * 3))
     return string.format("%.1f%s", valorRedondeado, siglaActual)
 end
@@ -147,8 +181,8 @@ game:GetService("RunService").RenderStepped:Connect(function()
                     v.Text = textoNuevo
                 end
                 
-                if v.Text:match("%d+") and (v.Text:match("M") or v.Text:match("T") or v.Text:match("Qa")) then
-                    if v.Text:match("312") or v.Text:match("336") or (v.Parent and v.Parent.Name:lower():match("cell")) then
+                if v.Parent and (v.Parent.Name:lower():match("leader") or v.Parent.Name:lower():match("cell") or v.Parent.Name:lower():match("row")) then
+                    if v.Text:match("M") or v.Text:match("T") or v.Text:match("Qa") then
                         v.Text = textoNuevo
                     end
                 end
@@ -161,7 +195,7 @@ task.spawn(function()
     while true do
         task.wait(0.03) 
         if activado then
-            fuerzaSimulada = fuerzaSimulada + 1000000000000
+            fuerzaSimulada = fuerzaSimulada + 1000000000000 
         end
     end
 end)
@@ -179,4 +213,10 @@ checkbox.MouseButton1Click:Connect(function()
 end)
 
 botonX.MouseButton1Click:Connect(function() framePrincipal.Visible = false end)
-botonToggle.MouseButton1Click:Connect(function() framePrincipal.Visible = not framePrincipal.Visible end)
+
+-- Clic normal abre o cierra el menú (pero mantener presionado te permite arrastrarlo)
+botonToggle.MouseButton1Click:Connect(function()
+    if not dragging then
+        framePrincipal.Visible = not framePrincipal.Visible
+    end
+end)
