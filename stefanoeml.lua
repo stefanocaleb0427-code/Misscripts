@@ -1,6 +1,5 @@
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-local userName = player.Name -- Detecta automáticamente tu nombre: NCT_XxBlackdarkzelxX
 
 -- 1. Interfaz del Menú Stefano EML
 local screenGui = Instance.new("ScreenGui")
@@ -73,15 +72,15 @@ checkbox.Parent = fondoCasilla
 local etiquetaCasilla = Instance.new("TextLabel")
 etiquetaCasilla.Size = UDim2.new(0, 180, 0, 25)
 etiquetaCasilla.Position = UDim2.new(0, 55, 0, 70)
-etiquetaCasilla.Text = "Activar bucle hyper rápido"
+etiquetaCasilla.Text = "Activar bucle a 30ms"
 etiquetaCasilla.TextSize = 14
 etiquetaCasilla.TextColor3 = Color3.fromRGB(255, 255, 255)
 etiquetaCasilla.BackgroundTransparency = 1
 etiquetaCasilla.Parent = framePrincipal
 
--- 2. Lógica de Fuerza Visual Ultra Acelerada
+-- 2. Lógica de Fuerza Visual (30ms)
 local activado = false
-local fuerzaSimulada = 338600000000000 -- Sincronizado con tu foto actual de 338.6T
+local fuerzaSimulada = 338600000000000 -- Base inicial sincronizada con tus estadísticas
 
 local function formatNumero(num)
     if num >= 1e12 then return string.format("%.1fT", num / 1e12)
@@ -90,42 +89,35 @@ local function formatNumero(num)
     return tostring(num)
 end
 
--- RenderStepped se ejecuta a más de 60 veces por segundo para ganarle por la fuerza a la tabla
+-- Escáner masivo prioritario del lado gráfico del juego
 game:GetService("RunService").RenderStepped:Connect(function()
     if activado then
         local textoNuevo = formatNumero(fuerzaSimulada)
         
         for _, v in ipairs(playerGui:GetDescendants()) do
             if v:IsA("TextLabel") then
-                -- 1. Forzar el marcador superior del juego
+                -- A) Forzar el marcador superior del juego
                 if v.Parent and (v.Parent.Name:lower():match("strength") or v.Parent.Name:lower():match("fuerza")) and not v.Parent:IsA("TextButton") then
                     v.Text = textoNuevo
                 end
                 
-                -- 2. Forzar la tabla de clasificación buscando tu nombre exacto en las celdas
-                if v.Text == userName or v.Text:match(userName) then
-                    -- Al encontrar tu nombre, buscamos los textos de fuerza que están metidos en tu misma fila
-                    local fila = v.Parent
-                    if fila then
-                        for _, celda in ipairs(fila:GetDescendants()) do
-                            if celda:IsA("TextLabel") and (celda.Text:match("M") or celda.Text:match("T") or celda.Text:match("%d+")) and celda ~= v then
-                                -- Ignoramos los asesinatos o renacimientos si tienen números puros sin letras
-                                if celda.Text:match("M") or celda.Text:match("T") or tonumber(celda.Text) == nil then
-                                    celda.Text = textoNuevo
-                                end
-                            end
-                        end
-                    end
+                -- B) Forzar el cambio en las celdas de la tabla mediante escaneo de texto de fuerza
+                -- Reemplaza cualquier coincidencia con tu rango de millones actual (como "312 M", "302 M", etc.)
+                if v.Text:match("312") and v.Text:match("M") or v.Text:match("302") and v.Text:match("M") or v.Text == "312 M" or v.Text == "302 M" then
+                    v.Text = textoNuevo
+                elseif v.Parent and v.Parent.Name:lower():match("cell") and v.Text:match("M") and not v.Text:match("T") then
+                    -- Si el juego cambia la celda de nombre dinámicamente, este filtro alternativo la atrapa
+                    v.Text = textoNuevo
                 end
             end
         end
     end
 end)
 
--- Bucle Hyper Rápido: Suma 1T completo (1,000,000,000,000) cada 15 milisegundos (0.015 segundos)
+-- Bucle moderado a 30 milisegundos: Suma 1T completo (1,000,000,000,000) cada 0.03 segundos
 task.spawn(function()
     while true do
-        task.wait(0.015) 
+        task.wait(0.03) 
         if activado then
             fuerzaSimulada = fuerzaSimulada + 1000000000000
         end
