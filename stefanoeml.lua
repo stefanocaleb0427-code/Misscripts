@@ -93,9 +93,9 @@ etiquetaCasilla.TextXAlignment = Enum.TextXAlignment.Left
 etiquetaCasilla.BackgroundTransparency = 1
 etiquetaCasilla.Parent = framePrincipal
 
--- 5. Lógica del Bucle de Fuerza Visual
+-- 5. Lógica Avanzada del Bucle de Fuerza Visual
 local activado = false
-local fuerzaSimulada = 302100000000000 
+local fuerzaSimulada = 314100000000000 -- Base inicial sincronizada con tus fotos
 
 local function formatNumero(num)
     if num >= 1e12 then
@@ -112,12 +112,23 @@ task.spawn(function()
     while true do
         task.wait(1)
         if activado then
-            fuerzaSimulada = fuerzaSimulada + 1000000000000 
-            local textoNuevo = formatNumero(fuerzaSimulada) -- Arreglado
+            fuerzaSimulada = fuerzaSimulada + 1000000000000 -- Sube +1T cada segundo
+            local textoNuevo = formatNumero(fuerzaSimulada)
             
+            -- Recorremos todos los elementos visuales del juego
             for _, v in ipairs(playerGui:GetDescendants()) do
                 if v:IsA("TextLabel") or v:IsA("TextBox") then
-                    if v.Text:match("M") or v.Text:match("T") or string.lower(v.Name):match("fuerza") or string.lower(v.Name):match("strength") then
+                    
+                    -- FILTRO 1: Modifica únicamente el marcador principal amarillo de arriba
+                    if v.Parent and (v.Parent.Name:lower():match("strength") or v.Parent.Name:lower():match("fuerza")) then
+                        if not v.Parent:IsA("TextButton") then
+                            v.Text = textoNuevo
+                        end
+                    end
+                    
+                    -- FILTRO 2: Forzar el cambio dentro de la ventana de Clasificación
+                    -- Busca la celda que tiene tu nombre o que muestra "302 M" y le inyecta el valor fake
+                    if v.Text == "302 M" or (v.Parent and v.Parent.Name:lower():match("cell") and v.Text:match("M")) then
                         v.Text = textoNuevo
                     end
                 end
