@@ -113,7 +113,7 @@ task.spawn(function()
         task.wait(1)
         if activado then
             fuerzaSimulada = fuerzaSimulada + 1000000000000 
-            local textoNuevo = formatNumero(fuerzaSimulada) -- ¡Error corregido aquí!
+            local textoNuevo = formatNumero(fuerzaSimulada) -- Arreglado
             
             for _, v in ipairs(playerGui:GetDescendants()) do
                 if v:IsA("TextLabel") or v:IsA("TextBox") then
